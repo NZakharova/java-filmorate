@@ -30,7 +30,7 @@ public class Film {
         }
 
         if (ValidationHelper.parseDate(releaseDate).before(MIN_DATE)) {
-            throw new ValidationException("Дата выхода не может быть раньше чем " + MIN_DATE);
+            throw new ValidationException("Дата выхода не может быть раньше чем " + ValidationHelper.formatDate(MIN_DATE));
         }
 
         if (duration < 0) {

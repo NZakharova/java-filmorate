@@ -21,4 +21,8 @@ public class ValidationHelper {
             throw new ValidationException("Некорректный формат даты", ex);
         }
     }
+
+    public static String formatDate(Date date) {
+        return format.dateFormat.format(date);
+    }
 }
