@@ -6,11 +6,12 @@ import java.util.List;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmValidator;
 import ru.yandex.practicum.filmorate.model.IdGenerator;
 import ru.yandex.practicum.filmorate.model.ValidationException;
 
-@RestController
 @Slf4j
+@RestController
 public class FilmController {
 
     private final List<Film> films = new ArrayList<>();
@@ -23,12 +24,7 @@ public class FilmController {
 
     @PostMapping(value = "/films")
     public Film create(@RequestBody Film film) throws ValidationException {
-        try {
-            film.validate();
-        } catch (ValidationException ex) {
-            log.error("Ошибка валидации", ex);
-            throw ex;
-        }
+        FilmValidator.validate(film);
 
         film.setId(idGenerator.getNextId());
 
@@ -39,17 +35,12 @@ public class FilmController {
 
     @PutMapping(value = "/films")
     public Film update(@RequestBody Film film) throws ValidationException {
-        try {
-            film.validate();
-        } catch (ValidationException ex) {
-            log.error("Ошибка валидации", ex);
-            throw ex;
-        }
+        FilmValidator.validate(film);
 
-        for (var f : films) {
-            if (f.getId() == film.getId()) {
-                films.remove(f);
-                log.info("Заменён фильм: " + f + " на " + film);
+        for (var knownFilm : films) {
+            if (knownFilm.getId() == film.getId()) {
+                films.remove(knownFilm);
+                log.info("Заменён фильм: " + knownFilm + " на " + film);
                 films.add(film);
                 return film;
             }

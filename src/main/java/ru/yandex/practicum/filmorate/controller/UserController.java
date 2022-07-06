@@ -5,13 +5,10 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.IdGenerator;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.ValidationException;
+import ru.yandex.practicum.filmorate.model.*;
 
-@RestController
 @Slf4j
+@RestController
 public class UserController {
 
     private final List<User> users = new ArrayList<>();
@@ -24,12 +21,7 @@ public class UserController {
 
     @PostMapping(value = "/users")
     public User create(@RequestBody User user) throws ValidationException {
-        try {
-            user.validate();
-        } catch (ValidationException ex) {
-            log.error("Ошибка валидации", ex);
-            throw ex;
-        }
+        UserValidator.validate(user);
 
         user.setId(idGenerator.getNextId());
 
@@ -44,21 +36,16 @@ public class UserController {
 
     @PutMapping(value = "/users")
     public User update(@RequestBody User user) throws ValidationException {
-        try {
-            user.validate();
-        } catch (ValidationException ex) {
-            log.error("Ошибка валидации", ex);
-            throw ex;
-        }
+        UserValidator.validate(user);
 
         if (user.getName() == null || user.getName().length() == 0) {
             user.setName(user.getLogin());
         }
 
-        for (var f : users) {
-            if (f.getId() == user.getId()) {
-                users.remove(f);
-                log.info("Заменён пользователь: " + f + " на " + user);
+        for (var knownUser : users) {
+            if (knownUser.getId() == user.getId()) {
+                users.remove(knownUser);
+                log.info("Заменён пользователь: " + knownUser + " на " + user);
                 users.add(user);
                 return user;
             }

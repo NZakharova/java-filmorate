@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class ValidationHelper {
     private ValidationHelper() {
@@ -11,18 +10,14 @@ public class ValidationHelper {
     static FormatHolder format = new FormatHolder();
 
     private static class FormatHolder {
-        private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        private final DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
-    public static Date parseDate(String s) throws ValidationException {
-        try {
-            return format.dateFormat.parse(s);
-        } catch (ParseException ex) {
-            throw new ValidationException("Некорректный формат даты", ex);
-        }
+    public static String formatDate(LocalDate date) {
+        return format.dateTimeFormat.format(date);
     }
 
-    public static String formatDate(Date date) {
-        return format.dateFormat.format(date);
+    public static LocalDate parseDate(String date) {
+        return LocalDate.parse(date, format.dateTimeFormat);
     }
 }
