@@ -1,51 +1,47 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmValidator;
-import ru.yandex.practicum.filmorate.model.IdGenerator;
 import ru.yandex.practicum.filmorate.model.ValidationException;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 @Slf4j
 @RestController
 public class FilmController {
 
-    private final List<Film> films = new ArrayList<>();
-    private final IdGenerator idGenerator = new IdGenerator();
+    private final FilmStorage filmStorage;
+
+    public FilmController(FilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
+    }
 
     @GetMapping("/films")
     public List<Film> findAll() {
-        return films;
+        return filmStorage.getAll();
     }
 
     @PostMapping(value = "/films")
     public Film create(@RequestBody Film film) throws ValidationException {
         FilmValidator.validate(film);
-
-        film.setId(idGenerator.getNextId());
-
-        log.info("Добавлен фильм: " + film);
-        films.add(film);
-        return film;
+        return filmStorage.add(film);
     }
 
     @PutMapping(value = "/films")
     public Film update(@RequestBody Film film) throws ValidationException {
         FilmValidator.validate(film);
 
-        for (var knownFilm : films) {
-            if (knownFilm.getId() == film.getId()) {
-                films.remove(knownFilm);
-                log.info("Заменён фильм: " + knownFilm + " на " + film);
-                films.add(film);
-                return film;
-            }
+        var result = filmStorage.update(film);
+
+        if (result == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "фильм не найден, id=" + film.getId());
         }
 
-        throw new ValidationException("Фильм не найден");
+        return result;
     }
 }
