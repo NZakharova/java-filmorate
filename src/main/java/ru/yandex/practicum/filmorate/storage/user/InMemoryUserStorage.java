@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.IdGenerator;
+import ru.yandex.practicum.filmorate.model.UserValidator;
+import ru.yandex.practicum.filmorate.model.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +15,20 @@ import java.util.List;
 public class InMemoryUserStorage implements UserStorage {
     private final List<User> users = new ArrayList<>();
     private final IdGenerator idGenerator = new IdGenerator();
+    private final UserValidator validator;
+
+    public  InMemoryUserStorage(UserValidator validator) {
+        this.validator = validator;
+    }
 
     @Override
-    public User add(User user) {
+    public User add(User user) throws ValidationException {
+        replaceEmptyName(user);
+
+        validator.validate(user);
+
         user.setId(idGenerator.getNextId());
 
-        replaceEmptyName(user);
 
         log.info("Добавлен пользователь: " + user);
         users.add(user);
@@ -42,10 +52,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User update(User user) {
+    public User update(User user) throws ValidationException {
+        replaceEmptyName(user);
+        validator.validate(user);
+
         var removedUser = remove(user.getId());
         if (removedUser != null) {
-            replaceEmptyName(user);
 
             users.add(user);
             log.info("Заменён пользователь: " + removedUser + " на " + user);

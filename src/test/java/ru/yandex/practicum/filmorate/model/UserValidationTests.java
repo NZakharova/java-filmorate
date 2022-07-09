@@ -10,14 +10,15 @@ class UserValidationTests {
     private static final String VALID_EMAIL = "user@ya.ru";
     private static final String VALID_LOGIN = "user";
     private static final LocalDate VALID_BIRTHDAY = parseDate("1970-11-30");
+    private static final UserValidator VALIDATOR = new UserValidator();
 
     private static void runFailTest(String message, User user) {
-        var ex = assertThrows(ValidationException.class, () -> UserValidator.validate(user));
+        var ex = assertThrows(ValidationException.class, () -> VALIDATOR.validate(user));
         assertEquals(message, ex.getMessage());
     }
 
     private static void runSuccessTest(User user) {
-        assertDoesNotThrow(() -> UserValidator.validate(user));
+        assertDoesNotThrow(() -> VALIDATOR.validate(user));
     }
 
     @Test

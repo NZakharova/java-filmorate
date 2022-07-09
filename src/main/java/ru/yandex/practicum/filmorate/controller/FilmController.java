@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.FilmValidator;
 import ru.yandex.practicum.filmorate.model.ValidationException;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
@@ -28,14 +27,11 @@ public class FilmController {
 
     @PostMapping(value = "/films")
     public Film create(@RequestBody Film film) throws ValidationException {
-        FilmValidator.validate(film);
         return filmStorage.add(film);
     }
 
     @PutMapping(value = "/films")
     public Film update(@RequestBody Film film) throws ValidationException {
-        FilmValidator.validate(film);
-
         var result = filmStorage.update(film);
 
         if (result == null) {

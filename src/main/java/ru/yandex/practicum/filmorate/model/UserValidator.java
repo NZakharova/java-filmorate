@@ -1,18 +1,17 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
 @Slf4j
+@Service
 public class UserValidator {
 
-    private UserValidator() {
-    }
-
-    public static void validate(User user) throws ValidationException {
+    public void validate(User user) throws ValidationException {
         String message = getError(user);
         if (message != null) {
             log.error(message);

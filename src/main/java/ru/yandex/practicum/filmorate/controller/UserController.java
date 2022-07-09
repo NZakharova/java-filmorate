@@ -26,15 +26,11 @@ public class UserController {
 
     @PostMapping(value = "/users")
     public User create(@RequestBody User user) throws ValidationException {
-        UserValidator.validate(user);
-
         return userStorage.add(user);
     }
 
     @PutMapping(value = "/users")
     public User update(@RequestBody User user) throws ValidationException {
-        UserValidator.validate(user);
-
         var updated = userStorage.update(user);
         if (updated == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден, id=" + user.getId());

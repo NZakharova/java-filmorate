@@ -10,16 +10,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmValidationTests {
     private static final String VALID_NAME = "Titanic";
     private static final LocalDate VALID_RELEASE_DATE = parseDate("1997-12-19");
-
     private static final int VALID_DURATION = 220;
 
+    private static final FilmValidator VALIDATOR = new FilmValidator();
+
     private static void runFailTest(String message, Film film) {
-        var ex = assertThrows(ValidationException.class, () -> FilmValidator.validate(film));
+        var ex = assertThrows(ValidationException.class, () -> VALIDATOR.validate(film));
         assertEquals(message, ex.getMessage());
     }
 
     private static void runSuccessTest(Film film) {
-        assertDoesNotThrow(() -> FilmValidator.validate((film)));
+        assertDoesNotThrow(() -> VALIDATOR.validate((film)));
     }
 
     @Test

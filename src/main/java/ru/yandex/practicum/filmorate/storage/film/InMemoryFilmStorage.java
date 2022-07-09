@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmValidator;
 import ru.yandex.practicum.filmorate.model.IdGenerator;
+import ru.yandex.practicum.filmorate.model.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +15,15 @@ import java.util.List;
 public class InMemoryFilmStorage implements FilmStorage {
     private final List<Film> films = new ArrayList<>();
     private final IdGenerator idGenerator = new IdGenerator();
+    private final FilmValidator validator;
+
+    public InMemoryFilmStorage(FilmValidator validator) {
+        this.validator = validator;
+    }
 
     @Override
-    public Film add(Film film) {
+    public Film add(Film film) throws ValidationException {
+        validator.validate(film);
         film.setId(idGenerator.getNextId());
         log.info("Добавлен фильм: " + film);
         films.add(film);
@@ -33,7 +41,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film film) {
+    public Film update(Film film) throws ValidationException {
+        validator.validate(film);
+
         var removedFilm = remove(film.getId());
         if (removedFilm != null) {
             films.add(film);
