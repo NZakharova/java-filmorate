@@ -58,7 +58,6 @@ public class InMemoryUserStorage implements UserStorage {
 
         var removedUser = remove(user.getId());
         if (removedUser != null) {
-
             users.add(user);
             log.info("Заменён пользователь: " + removedUser + " на " + user);
             return user;
