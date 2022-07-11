@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.IdGenerator;
 import ru.yandex.practicum.filmorate.model.UserValidator;
-import ru.yandex.practicum.filmorate.model.ValidationException;
+import ru.yandex.practicum.filmorate.model.exceptions.UserNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,21 +14,21 @@ import java.util.List;
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private final List<User> users = new ArrayList<>();
-    private final IdGenerator idGenerator = new IdGenerator();
+    private final IdGenerator idGenerator;
     private final UserValidator validator;
 
-    public  InMemoryUserStorage(UserValidator validator) {
+    public InMemoryUserStorage(UserValidator validator, IdGenerator idGenerator) {
         this.validator = validator;
+        this.idGenerator = idGenerator;
     }
 
     @Override
-    public User add(User user) throws ValidationException {
+    public User add(User user) {
         replaceEmptyName(user);
 
         validator.validate(user);
 
         user.setId(idGenerator.getNextId());
-
 
         log.info("Добавлен пользователь: " + user);
         users.add(user);
@@ -44,26 +44,19 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User remove(int id) {
         var user = find(id);
-        if (user != null) {
-            users.remove(user);
-        }
-
+        users.remove(user);
         return user;
     }
 
     @Override
-    public User update(User user) throws ValidationException {
+    public User update(User user) {
         replaceEmptyName(user);
         validator.validate(user);
 
         var removedUser = remove(user.getId());
-        if (removedUser != null) {
-            users.add(user);
-            log.info("Заменён пользователь: " + removedUser + " на " + user);
-            return user;
-        }
-
-        return null;
+        users.add(user);
+        log.info("Заменён пользователь: " + removedUser + " на " + user);
+        return user;
     }
 
     @Override
@@ -79,6 +72,6 @@ public class InMemoryUserStorage implements UserStorage {
             }
         }
 
-        return null;
+        throw new UserNotFoundException(id);
     }
 }

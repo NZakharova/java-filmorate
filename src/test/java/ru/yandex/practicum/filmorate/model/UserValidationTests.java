@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.model.exceptions.ValidationException;
 
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,15 +11,16 @@ class UserValidationTests {
     private static final String VALID_EMAIL = "user@ya.ru";
     private static final String VALID_LOGIN = "user";
     private static final LocalDate VALID_BIRTHDAY = parseDate("1970-11-30");
-    private static final UserValidator VALIDATOR = new UserValidator();
 
-    private static void runFailTest(String message, User user) {
-        var ex = assertThrows(ValidationException.class, () -> VALIDATOR.validate(user));
+    private final UserValidator validator = new UserValidator();
+
+    private void runFailTest(String message, User user) {
+        var ex = assertThrows(ValidationException.class, () -> validator.validate(user));
         assertEquals(message, ex.getMessage());
     }
 
-    private static void runSuccessTest(User user) {
-        assertDoesNotThrow(() -> VALIDATOR.validate(user));
+    private void runSuccessTest(User user) {
+        assertDoesNotThrow(() -> validator.validate(user));
     }
 
     @Test

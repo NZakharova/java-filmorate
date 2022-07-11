@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.exceptions;
+package ru.yandex.practicum.filmorate.model.exceptions;
 
 public class UserNotFoundException extends ObjectNotFoundException {
     public UserNotFoundException(int id) {

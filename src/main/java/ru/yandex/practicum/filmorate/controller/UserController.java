@@ -9,69 +9,54 @@ import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.service.exceptions.ObjectNotFoundException;
-import ru.yandex.practicum.filmorate.service.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.model.exceptions.ObjectNotFoundException;
 
 @Slf4j
 @RestController
 public class UserController {
-
-    private final UserStorage userStorage;
     private final UserService userService;
 
-    public UserController(UserStorage userStorage, UserService userService) {
-        this.userStorage = userStorage;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping("/users")
     public List<User> findAll() {
-        return userStorage.getAll();
+        return userService.getAll();
     }
 
     @GetMapping("/users/{id}")
-    public User find(@PathVariable int id) throws UserNotFoundException {
-        var user = userStorage.find(id);
-        if (user == null) {
-            throw new UserNotFoundException(id);
-        }
-
-        return user;
+    public User find(@PathVariable int id) {
+        return userService.find(id);
     }
 
     @PostMapping(value = "/users")
-    public User create(@RequestBody User user) throws ValidationException {
-        return userStorage.add(user);
+    public User create(@RequestBody User user) {
+        return userService.add(user);
     }
 
     @PutMapping(value = "/users")
-    public User update(@RequestBody User user) throws ValidationException, ObjectNotFoundException {
-        var updated = userStorage.update(user);
-        if (updated == null) {
-            throw new UserNotFoundException(user.getId());
-        }
-
-        return updated;
+    public User update(@RequestBody User user) {
+        return userService.update(user);
     }
 
     @PutMapping("/users/{userId}/friends/{friendId}")
-    public void addFriend(@PathVariable int userId, @PathVariable int friendId) throws UserNotFoundException {
+    public void addFriend(@PathVariable int userId, @PathVariable int friendId) {
         userService.addFriend(userId, friendId);
     }
 
     @DeleteMapping("/users/{userId}/friends/{friendId}")
-    public void removeFriend(@PathVariable int userId, @PathVariable int friendId) throws UserNotFoundException {
+    public void removeFriend(@PathVariable int userId, @PathVariable int friendId) {
         userService.removeFriend(userId, friendId);
     }
 
     @GetMapping("/users/{userId}/friends")
-    public Collection<User> getFriends(@PathVariable int userId) throws UserNotFoundException {
+    public Collection<User> getFriends(@PathVariable int userId) {
         return userService.getFriends(userId);
     }
 
     @GetMapping("/users/{userId}/friends/common/{otherId}")
-    public Collection<User> getCommonFriends(@PathVariable int userId, @PathVariable int otherId) throws UserNotFoundException {
+    public Collection<User> getCommonFriends(@PathVariable int userId, @PathVariable int otherId) {
         return userService.getCommonFriends(userId, otherId);
     }
 
