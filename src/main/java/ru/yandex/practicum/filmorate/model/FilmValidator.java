@@ -1,18 +1,18 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.exceptions.ValidationException;
 
 import java.time.LocalDate;
 
 @Slf4j
+@Service
 public class FilmValidator {
     private static final int MAX_DESCRIPTION_LENGTH = 200;
     private static final LocalDate MIN_DATE = ValidationHelper.parseDate("1895-12-28");
 
-    private FilmValidator() {
-    }
-
-    public static void validate(Film film) throws ValidationException {
+    public void validate(Film film) throws ValidationException {
         String message = getError(film);
         if (message != null) {
             log.error(message);

@@ -1,56 +1,67 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.model.exceptions.ObjectNotFoundException;
 
 @Slf4j
 @RestController
 public class UserController {
+    private final UserService userService;
 
-    private final List<User> users = new ArrayList<>();
-    private final IdGenerator idGenerator = new IdGenerator();
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/users")
     public List<User> findAll() {
-        return users;
+        return userService.getAll();
+    }
+
+    @GetMapping("/users/{id}")
+    public User find(@PathVariable int id) {
+        return userService.find(id);
     }
 
     @PostMapping(value = "/users")
-    public User create(@RequestBody User user) throws ValidationException {
-        UserValidator.validate(user);
-
-        user.setId(idGenerator.getNextId());
-
-        if (user.getName() == null || user.getName().length() == 0) {
-            user.setName(user.getLogin());
-        }
-
-        log.info("Добавлен фильм: " + user);
-        users.add(user);
-        return user;
+    public User create(@RequestBody User user) {
+        return userService.add(user);
     }
 
     @PutMapping(value = "/users")
-    public User update(@RequestBody User user) throws ValidationException {
-        UserValidator.validate(user);
+    public User update(@RequestBody User user) {
+        return userService.update(user);
+    }
 
-        if (user.getName() == null || user.getName().length() == 0) {
-            user.setName(user.getLogin());
-        }
+    @PutMapping("/users/{userId}/friends/{friendId}")
+    public void addFriend(@PathVariable int userId, @PathVariable int friendId) {
+        userService.addFriend(userId, friendId);
+    }
 
-        for (var knownUser : users) {
-            if (knownUser.getId() == user.getId()) {
-                users.remove(knownUser);
-                log.info("Заменён пользователь: " + knownUser + " на " + user);
-                users.add(user);
-                return user;
-            }
-        }
+    @DeleteMapping("/users/{userId}/friends/{friendId}")
+    public void removeFriend(@PathVariable int userId, @PathVariable int friendId) {
+        userService.removeFriend(userId, friendId);
+    }
 
-        throw new ValidationException("Пользователь не найден");
+    @GetMapping("/users/{userId}/friends")
+    public Collection<User> getFriends(@PathVariable int userId) {
+        return userService.getFriends(userId);
+    }
+
+    @GetMapping("/users/{userId}/friends/common/{otherId}")
+    public Collection<User> getCommonFriends(@PathVariable int userId, @PathVariable int otherId) {
+        return userService.getCommonFriends(userId, otherId);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleObjectNotFoundException(ObjectNotFoundException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 }
