@@ -1,5 +1,5 @@
 MERGE INTO
-    "genre" ("genreId", "name")
+    `genre` (`genreId`, `name`)
 VALUES
     (1, 'Комедия'),
     (2, 'Драма'),
@@ -9,7 +9,7 @@ VALUES
     (6, 'Боевик');
 
 MERGE INTO
-    "rating" ("ratingId", "name", "description")
+    `rating` (`ratingId`, `name`, `description`)
 VALUES
     (1, 'G', 'у фильма нет возрастных ограничений'),
     (2, 'PG', 'детям рекомендуется смотреть фильм с родителями'),

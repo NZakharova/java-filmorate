@@ -32,12 +32,14 @@ public class UserController {
 
     @PostMapping(value = "/users")
     public User create(@RequestBody User user) {
-        return userService.add(user);
+        int id = userService.add(user);
+        return userService.find(id);
     }
 
     @PutMapping(value = "/users")
     public User update(@RequestBody User user) {
-        return userService.update(user);
+        userService.update(user);
+        return userService.find(user.getId());
     }
 
     @PutMapping("/users/{userId}/friends/{friendId}")

@@ -39,11 +39,11 @@ public class FilmService {
         return filmStorage.find(id);
     }
 
-    public Film add(Film film) {
-        return  filmStorage.add(film);
+    public int add(Film film) {
+        return filmStorage.add(film);
     }
 
-    public Film update(Film film) {
-        return filmStorage.update(film);
+    public void update(Film film) {
+        filmStorage.update(film);
     }
 }

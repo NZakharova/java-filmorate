@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.exceptions.ValidationException;
 
 import java.time.LocalDate;
+import java.util.Collections;
+
 import static ru.yandex.practicum.filmorate.model.ValidationHelper.parseDate;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,53 +26,57 @@ class FilmValidationTests {
         assertDoesNotThrow(() -> validator.validate((film)));
     }
 
+    private static Film newFilm(String name, String description, LocalDate releaseDate, int duration) {
+        return new Film(0, name, description, releaseDate, duration, 0, null, Collections.emptyList());
+    }
+
     @Test
     void testDoesNotThrowWithValidInput() {
-        runSuccessTest(new Film(VALID_NAME, "", VALID_RELEASE_DATE, VALID_DURATION));
+        runSuccessTest(newFilm(VALID_NAME, "", VALID_RELEASE_DATE, VALID_DURATION));
     }
 
     @Test
     void testName() {
         runFailTest("Имя не может быть пустым",
-                new Film("", "", VALID_RELEASE_DATE, VALID_DURATION));
+                newFilm("", "", VALID_RELEASE_DATE, VALID_DURATION));
     }
 
     @Test
     void testDescription() {
         runFailTest("Описание не может быть длиннее 200 символов. Длина: 201",
-                new Film(VALID_NAME, "a".repeat(201), VALID_RELEASE_DATE, VALID_DURATION));
+                newFilm(VALID_NAME, "a".repeat(201), VALID_RELEASE_DATE, VALID_DURATION));
 
         runFailTest("Описание не может быть длиннее 200 символов. Длина: 220",
-                new Film(VALID_NAME, "a".repeat(220), VALID_RELEASE_DATE, VALID_DURATION));
+                newFilm(VALID_NAME, "a".repeat(220), VALID_RELEASE_DATE, VALID_DURATION));
 
-        runSuccessTest(new Film(VALID_NAME, "a".repeat(200), VALID_RELEASE_DATE, VALID_DURATION));
-        runSuccessTest(new Film(VALID_NAME, "a".repeat(199), VALID_RELEASE_DATE, VALID_DURATION));
-        runSuccessTest(new Film(VALID_NAME, "", VALID_RELEASE_DATE, VALID_DURATION));
+        runSuccessTest(newFilm(VALID_NAME, "a".repeat(200), VALID_RELEASE_DATE, VALID_DURATION));
+        runSuccessTest(newFilm(VALID_NAME, "a".repeat(199), VALID_RELEASE_DATE, VALID_DURATION));
+        runSuccessTest(newFilm(VALID_NAME, "", VALID_RELEASE_DATE, VALID_DURATION));
     }
 
     @Test
     void testReleaseDate() {
         runFailTest("Дата выхода не может быть раньше чем 1895-12-28. Значение: 1895-12-27",
-                new Film(VALID_NAME, "", parseDate("1895-12-27"), VALID_DURATION));
+                newFilm(VALID_NAME, "", parseDate("1895-12-27"), VALID_DURATION));
         runFailTest("Дата выхода не может быть раньше чем 1895-12-28. Значение: 1800-12-27",
-                new Film(VALID_NAME, "", parseDate("1800-12-27"), VALID_DURATION));
+                newFilm(VALID_NAME, "", parseDate("1800-12-27"), VALID_DURATION));
 
-        runSuccessTest(new Film(VALID_NAME, "", parseDate("1895-12-29"), VALID_DURATION));
-        runSuccessTest(new Film(VALID_NAME, "", parseDate("1895-12-30"), VALID_DURATION));
-        runSuccessTest(new Film(VALID_NAME, "", parseDate("2020-12-30"), VALID_DURATION));
+        runSuccessTest(newFilm(VALID_NAME, "", parseDate("1895-12-29"), VALID_DURATION));
+        runSuccessTest(newFilm(VALID_NAME, "", parseDate("1895-12-30"), VALID_DURATION));
+        runSuccessTest(newFilm(VALID_NAME, "", parseDate("2020-12-30"), VALID_DURATION));
     }
 
     @Test
     void testDuration() {
         runFailTest("Продолжительность не может быть отрицательной. Значение: -1",
-                new Film(VALID_NAME, "", VALID_RELEASE_DATE, -1));
+                newFilm(VALID_NAME, "", VALID_RELEASE_DATE, -1));
 
         runFailTest("Продолжительность не может быть отрицательной. Значение: -2",
-                new Film(VALID_NAME, "", VALID_RELEASE_DATE, -2));
+                newFilm(VALID_NAME, "", VALID_RELEASE_DATE, -2));
 
-        runSuccessTest(new Film(VALID_NAME, "", VALID_RELEASE_DATE, 0));
-        runSuccessTest(new Film(VALID_NAME, "", VALID_RELEASE_DATE, 1));
-        runSuccessTest(new Film(VALID_NAME, "", VALID_RELEASE_DATE, 100));
-        runSuccessTest(new Film(VALID_NAME, "", VALID_RELEASE_DATE, 1200));
+        runSuccessTest(newFilm(VALID_NAME, "", VALID_RELEASE_DATE, 0));
+        runSuccessTest(newFilm(VALID_NAME, "", VALID_RELEASE_DATE, 1));
+        runSuccessTest(newFilm(VALID_NAME, "", VALID_RELEASE_DATE, 100));
+        runSuccessTest(newFilm(VALID_NAME, "", VALID_RELEASE_DATE, 1200));
     }
 }

@@ -26,18 +26,20 @@ public class FilmController {
     }
 
     @GetMapping("/films/{id}")
-    public Film find(@PathVariable int id)  {
+    public Film find(@PathVariable int id) {
         return filmService.find(id);
     }
 
     @PostMapping(value = "/films")
     public Film create(@RequestBody Film film) {
-        return filmService.add(film);
+        int id = filmService.add(film);
+        return filmService.find(id);
     }
 
     @PutMapping(value = "/films")
     public Film update(@RequestBody Film film) {
-        return filmService.update(film);
+        filmService.update(film);
+        return filmService.find(film.getId());
     }
 
     @PutMapping("/films/{filmId}/like/{userId}")
