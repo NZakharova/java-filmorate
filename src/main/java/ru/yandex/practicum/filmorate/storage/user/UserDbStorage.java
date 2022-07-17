@@ -25,24 +25,11 @@ public class UserDbStorage implements UserStorage {
     @Override
     public int add(User user) {
         userValidator.validate(user);
-        var sql = "INSERT INTO `user` (`email`, `login`, `name`, `birthday`)" +
-                "VALUES (?,?,?,?)";
-
-        var keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            var statement = connection.prepareStatement(sql, new String[]{"userId"});
-            statement.setString(1, user.getEmail());
-            statement.setString(2, user.getLogin());
-            statement.setString(3, user.getName());
-            statement.setDate(4, java.sql.Date.valueOf(user.getBirthday()));
-            return statement;
-        }, keyHolder);
-
-        var key = keyHolder.getKey();
-        if (key == null) {
-            throw new UnsupportedOperationException("key == null");
+        if (user.getId() == 0) {
+            return addUserWithoutId(user);
+        } else {
+            return addUserWithId(user);
         }
-        return key.intValue();
     }
 
     @Override
@@ -112,5 +99,40 @@ public class UserDbStorage implements UserStorage {
                 set.getString("name"),
                 set.getDate("birthday").toLocalDate()
         );
+    }
+
+    private int addUserWithoutId(User user) {
+        var sql = "INSERT INTO `user` (`email`, `login`, `name`, `birthday`)" +
+                "VALUES (?,?,?,?)";
+
+        var keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            var statement = connection.prepareStatement(sql, new String[]{"userId"});
+            statement.setString(1, user.getEmail());
+            statement.setString(2, user.getLogin());
+            statement.setString(3, user.getName());
+            statement.setDate(4, java.sql.Date.valueOf(user.getBirthday()));
+            return statement;
+        }, keyHolder);
+
+        var key = keyHolder.getKey();
+        if (key == null) {
+            throw new UnsupportedOperationException("key == null");
+        }
+        return key.intValue();
+    }
+
+    private int addUserWithId(User user) {
+        var sql = "INSERT INTO `user` (`userId`, `email`, `login`, `name`, `birthday`)" +
+                "VALUES (?, ?,?,?,?)";
+
+        jdbcTemplate.update(sql,
+                user.getId(),
+                user.getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getBirthday());
+
+        return user.getId();
     }
 }

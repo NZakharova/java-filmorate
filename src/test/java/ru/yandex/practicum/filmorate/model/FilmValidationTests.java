@@ -17,19 +17,6 @@ class FilmValidationTests {
 
     private final FilmValidator validator = new FilmValidator();
 
-    private void runFailTest(String message, Film film) {
-        var ex = assertThrows(ValidationException.class, () -> validator.validate(film));
-        assertEquals(message, ex.getMessage());
-    }
-
-    private void runSuccessTest(Film film) {
-        assertDoesNotThrow(() -> validator.validate((film)));
-    }
-
-    private static Film newFilm(String name, String description, LocalDate releaseDate, int duration) {
-        return new Film(0, name, description, releaseDate, duration, 0, null, Collections.emptyList());
-    }
-
     @Test
     void testDoesNotThrowWithValidInput() {
         runSuccessTest(newFilm(VALID_NAME, "", VALID_RELEASE_DATE, VALID_DURATION));
@@ -78,5 +65,18 @@ class FilmValidationTests {
         runSuccessTest(newFilm(VALID_NAME, "", VALID_RELEASE_DATE, 1));
         runSuccessTest(newFilm(VALID_NAME, "", VALID_RELEASE_DATE, 100));
         runSuccessTest(newFilm(VALID_NAME, "", VALID_RELEASE_DATE, 1200));
+    }
+
+    private void runFailTest(String message, Film film) {
+        var ex = assertThrows(ValidationException.class, () -> validator.validate(film));
+        assertEquals(message, ex.getMessage());
+    }
+
+    private void runSuccessTest(Film film) {
+        assertDoesNotThrow(() -> validator.validate((film)));
+    }
+
+    private Film newFilm(String name, String description, LocalDate releaseDate, int duration) {
+        return new Film(0, name, description, releaseDate, duration, 0, null, Collections.emptyList());
     }
 }

@@ -15,19 +15,6 @@ class UserValidationTests {
 
     private final UserValidator validator = new UserValidator();
 
-    private void runFailTest(String message, User user) {
-        var ex = assertThrows(ValidationException.class, () -> validator.validate(user));
-        assertEquals(message, ex.getMessage());
-    }
-
-    private void runSuccessTest(User user) {
-        assertDoesNotThrow(() -> validator.validate(user));
-    }
-
-    private static User newUser(String email, String login, LocalDate birthday) {
-        return new User(0, email, login, null, birthday);
-    }
-
     @Test
     void testDoesNotThrowWithValidInput() {
         runSuccessTest(newUser(VALID_EMAIL, VALID_LOGIN, VALID_BIRTHDAY));
@@ -65,5 +52,18 @@ class UserValidationTests {
                 newUser(VALID_EMAIL, VALID_LOGIN, parseDate("2300-01-01")));
 
         runSuccessTest(newUser(VALID_EMAIL, VALID_LOGIN, parseDate("2022-01-01")));
+    }
+
+    private void runFailTest(String message, User user) {
+        var ex = assertThrows(ValidationException.class, () -> validator.validate(user));
+        assertEquals(message, ex.getMessage());
+    }
+
+    private void runSuccessTest(User user) {
+        assertDoesNotThrow(() -> validator.validate(user));
+    }
+
+    private User newUser(String email, String login, LocalDate birthday) {
+        return new User(0, email, login, null, birthday);
     }
 }

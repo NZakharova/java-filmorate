@@ -66,7 +66,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void remove(int id) {
-        throw new UnsupportedOperationException();
+        var sql = "DELETE FROM `film` WHERE `filmId` = ?";
+        int rows = jdbcTemplate.update(sql, id);
+        if (rows == 0) {
+            throw new FilmNotFoundException(id);
+        }
     }
 
     @Override
@@ -99,7 +103,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAll() {
-        var sql = "SELECT `filmId`, `name`, `description`, `releaseDate`, `duration`, `ratingId` " +
+        var sql = "SELECT `filmId`, `name`, `description`, `releaseDate`, `duration`, `rate`, `ratingId` " +
                 "FROM `film`";
         return jdbcTemplate.query(sql, this::toFilm);
     }
@@ -134,12 +138,22 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public List<Integer> getLikes(int filmId) {
+        var sql = "SELECT `userId` from `film_like` WHERE `filmId` = ?";
+        return jdbcTemplate.queryForList(sql, Integer.class, filmId);
+    }
+
+    @Override
     public List<Film> getMostPopularFilms(int count) {
         var sql = "SELECT f.`filmId`, f.`name`, f.`description`, f.`releaseDate`, f.`rate`, f.`duration`, f.`ratingId` " +
                 "FROM `film` AS f " +
-                "LEFT OUTER JOIN `film_like` AS fl ON f.`filmId` = fl.`filmId` " +
-                "GROUP BY f.`name` " +
-                "ORDER BY COUNT(fl.`userId`) DESC " +
+                "JOIN (" +
+                    "SELECT f.`filmId` " +
+                    "FROM `film` AS f " +
+                    "LEFT OUTER JOIN `film_like` AS fl ON f.`filmId` = fl.`filmId` " +
+                    "GROUP BY f.`filmId` " +
+                    "ORDER BY COUNT(fl.`userId`) DESC " +
+                ") x ON x.`filmId` = f.`filmId`" +
                 "LIMIT ?";
 
         return jdbcTemplate.query(sql, this::toFilm, count);

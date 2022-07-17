@@ -81,6 +81,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Integer> getLikes(int filmId) {
+        return List.copyOf(likes.getOrDefault(filmId, Collections.emptySet()));
+    }
+
+    @Override
     public List<Film> getMostPopularFilms(int count) {
         var allFilms = new ArrayList<>(getAll());
 
