@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 public class Film {
     private final int id;
 
@@ -21,7 +21,7 @@ public class Film {
 
     private final int rate;
 
-    private final Rating mpa;
+    private final Mpa mpa;
 
     private final List<Genre> genres;
 }

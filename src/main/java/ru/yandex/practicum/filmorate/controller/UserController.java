@@ -3,16 +3,15 @@ package ru.yandex.practicum.filmorate.controller;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.model.exceptions.ObjectNotFoundException;
 
 @Slf4j
 @RestController
+@Qualifier("userDb")
 public class UserController {
     private final UserService userService;
 
@@ -62,8 +61,4 @@ public class UserController {
         return userService.getCommonFriends(userId, otherId);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<String> handleObjectNotFoundException(ObjectNotFoundException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
-    }
 }

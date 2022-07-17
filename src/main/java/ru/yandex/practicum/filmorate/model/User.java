@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 @Data
 @Builder(toBuilder = true)
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 public class User {
     private final int id;
     @NonNull

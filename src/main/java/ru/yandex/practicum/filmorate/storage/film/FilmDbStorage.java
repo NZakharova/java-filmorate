@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-@Component
+@Component("filmDb")
 public class FilmDbStorage implements FilmStorage {
     private final FilmValidator filmValidator;
     private final MpaStorage mpaStorage;
@@ -97,22 +97,6 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private void updateGenres(int filmId, Collection<Genre> genres) {
-        jdbcTemplate.update("DELETE FROM `film_genre` WHERE `filmId` = ?", filmId);
-
-        var unique = new HashMap<Integer, Genre>();
-        for (var genre : genres) {
-            unique.put(genre.getId(), genre);
-        }
-
-        for (var genre : unique.values()) {
-            jdbcTemplate.update("INSERT INTO `film_genre` (`filmId`, `genreId`) VALUES (?, ?)",
-                    filmId,
-                    genre.getId()
-            );
-        }
-    }
-
     @Override
     public List<Film> getAll() {
         var sql = "SELECT `filmId`, `name`, `description`, `releaseDate`, `duration`, `ratingId` " +
@@ -131,29 +115,6 @@ public class FilmDbStorage implements FilmStorage {
         } catch (EmptyResultDataAccessException ex) {
             throw new FilmNotFoundException(id);
         }
-    }
-
-    private Film toFilm(ResultSet set, int rowNum) throws SQLException {
-        var filmId = set.getInt("filmId");
-
-        var genreIds = jdbcTemplate.queryForList("SELECT `genreId` FROM `film_genre` WHERE filmId = ?", Integer.class, filmId);
-
-        var genres = new ArrayList<Genre>();
-
-        for (var genreId : genreIds) {
-            genres.add(genreStorage.find(genreId));
-        }
-
-        return new Film(
-                filmId,
-                set.getString("name"),
-                set.getString("description"),
-                set.getDate("releaseDate").toLocalDate(),
-                set.getInt("duration"),
-                set.getInt("rate"),
-                mpaStorage.find(set.getInt("ratingId")),
-                genres
-        );
     }
 
     @Override
@@ -182,5 +143,45 @@ public class FilmDbStorage implements FilmStorage {
                 "LIMIT ?";
 
         return jdbcTemplate.query(sql, this::toFilm, count);
+    }
+
+    private Film toFilm(ResultSet set, int rowNum) throws SQLException {
+        var filmId = set.getInt("filmId");
+
+        var genreIds = jdbcTemplate.queryForList("SELECT `genreId` FROM `film_genre` WHERE filmId = ?", Integer.class, filmId);
+
+        var genres = new ArrayList<Genre>();
+
+        for (var genreId : genreIds) {
+            genres.add(genreStorage.find(genreId));
+        }
+
+        return new Film(
+                filmId,
+                set.getString("name"),
+                set.getString("description"),
+                set.getDate("releaseDate").toLocalDate(),
+                set.getInt("duration"),
+                set.getInt("rate"),
+                mpaStorage.find(set.getInt("ratingId")),
+                genres
+        );
+    }
+
+
+    private void updateGenres(int filmId, Collection<Genre> genres) {
+        jdbcTemplate.update("DELETE FROM `film_genre` WHERE `filmId` = ?", filmId);
+
+        var unique = new HashMap<Integer, Genre>();
+        for (var genre : genres) {
+            unique.put(genre.getId(), genre);
+        }
+
+        for (var genre : unique.values()) {
+            jdbcTemplate.update("INSERT INTO `film_genre` (`filmId`, `genreId`) VALUES (?, ?)",
+                    filmId,
+                    genre.getId()
+            );
+        }
     }
 }

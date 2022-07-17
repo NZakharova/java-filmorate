@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-@Component
+@Component("userDb")
 public class UserDbStorage implements UserStorage {
     private final UserValidator userValidator;
     private final JdbcTemplate jdbcTemplate;
@@ -84,17 +84,6 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    private User toUser(ResultSet set, int row) throws SQLException {
-        return new User(
-                set.getInt("userId"),
-                set.getString("email"),
-                set.getString("login"),
-                set.getString("name"),
-                set.getDate("birthday").toLocalDate()
-        );
-    }
-
-
     @Override
     public void addFriend(int userId, int friendId) {
         var sql = "INSERT INTO `user_friend` (`userId`, `friendId`) " +
@@ -113,5 +102,15 @@ public class UserDbStorage implements UserStorage {
     public List<Integer> getFriends(int userId) {
         var sql = "SELECT `friendId` FROM `user_friend` WHERE `userId` = ?";
         return jdbcTemplate.queryForList(sql, Integer.class, userId);
+    }
+
+    private User toUser(ResultSet set, int row) throws SQLException {
+        return new User(
+                set.getInt("userId"),
+                set.getString("email"),
+                set.getString("login"),
+                set.getString("name"),
+                set.getDate("birthday").toLocalDate()
+        );
     }
 }

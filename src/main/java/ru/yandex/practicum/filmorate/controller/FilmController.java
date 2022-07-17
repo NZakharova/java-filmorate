@@ -2,16 +2,15 @@ package ru.yandex.practicum.filmorate.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.model.exceptions.ObjectNotFoundException;
 
 @Slf4j
 @RestController
+@Qualifier("db")
 public class FilmController {
 
     private final FilmService filmService;
@@ -58,10 +57,5 @@ public class FilmController {
             count = 10;
         }
         return filmService.getMostPopularFilms(count);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<String> handleObjectNotFoundException(ObjectNotFoundException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

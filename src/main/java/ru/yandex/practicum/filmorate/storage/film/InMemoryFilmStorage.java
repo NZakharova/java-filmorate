@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.model.exceptions.FilmNotFoundException;
 import java.util.*;
 
 @Slf4j
-//@Component
+@Component
 public class InMemoryFilmStorage implements FilmStorage {
     private final List<Film> films = new ArrayList<>();
     private final IdGenerator idGenerator;

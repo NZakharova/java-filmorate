@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.model.exceptions.UserNotFoundException;
 import java.util.*;
 
 @Slf4j
-//@Component
+@Component
 public class InMemoryUserStorage implements UserStorage {
     private final List<User> users = new ArrayList<>();
     private final IdGenerator idGenerator;
