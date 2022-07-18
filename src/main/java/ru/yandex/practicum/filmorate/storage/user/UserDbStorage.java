@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-@Component("userDb")
+@Component("UserDbStorage")
 public class UserDbStorage implements UserStorage {
     private final UserValidator userValidator;
     private final JdbcTemplate jdbcTemplate;

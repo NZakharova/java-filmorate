@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -10,7 +9,6 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 @Slf4j
 @RestController
-@Qualifier("db")
 public class FilmController {
 
     private final FilmService filmService;

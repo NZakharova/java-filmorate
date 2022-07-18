@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-@Component("filmDb")
+@Component("FilmDbStorage")
 public class FilmDbStorage implements FilmStorage {
     private final FilmValidator filmValidator;
     private final MpaStorage mpaStorage;
