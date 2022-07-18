@@ -23,29 +23,28 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film add(Film film) {
+    public int add(Film film) {
         validator.validate(film);
-        film.setId(idGenerator.getNextId());
+        var filmToAdd = film.toBuilder().id(idGenerator.getNextId()).build();
         log.info("Добавлен фильм: " + film);
-        films.add(film);
-        return film;
+        films.add(filmToAdd);
+        return filmToAdd.getId();
     }
 
     @Override
-    public Film remove(int id) {
+    public void remove(int id) {
         var film = find(id);
         films.remove(film);
-        return film;
     }
 
     @Override
-    public Film update(Film film) {
+    public void update(Film film) {
         validator.validate(film);
 
-        var removedFilm = remove(film.getId());
+        var removedFilm = film.getId();
+        films.remove(removedFilm);
         films.add(film);
         log.info("Заменён фильм: " + removedFilm + " на " + film);
-        return film;
     }
 
     @Override
@@ -79,6 +78,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         } else {
             throw new FilmNotFoundException(filmId);
         }
+    }
+
+    @Override
+    public List<Integer> getLikes(int filmId) {
+        return List.copyOf(likes.getOrDefault(filmId, Collections.emptySet()));
     }
 
     @Override

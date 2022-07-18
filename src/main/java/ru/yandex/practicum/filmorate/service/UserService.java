@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
@@ -11,33 +11,40 @@ import java.util.*;
 public class UserService {
     private final UserStorage userStorage;
 
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("UserDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
-    public void addFriend(int userId, int friendId) {
-        User user = getUserOrThrow(userId);
-        User friend = getUserOrThrow(friendId);
+    private User replaceEmptyName(User user) {
+        if (user.getName() == null || user.getName().length() == 0) {
+            return user.toBuilder().name(user.getLogin()).build();
+        } else {
+            return user;
+        }
+    }
 
-        user.addFriend(friendId);
-        friend.addFriend(userId);
+    public void addFriend(int userId, int friendId) {
+        userStorage.find(userId);
+        userStorage.find(friendId);
+
+        userStorage.addFriend(userId, friendId);
     }
 
     public void removeFriend(int userId, int friendId) {
-        User user = getUserOrThrow(userId);
-        User friend = getUserOrThrow(friendId);
-        user.removeFriend(friendId);
-        friend.removeFriend(userId);
+        userStorage.find(userId);
+        userStorage.find(friendId);
+
+        userStorage.removeFriend(userId, friendId);
     }
 
     public Collection<User> getFriends(int userId) {
-        User user = getUserOrThrow(userId);
-        return getUsers(user.getFriends());
+        userStorage.find(userId);
+        return getUsers(userStorage.getFriends(userId));
     }
 
     public Collection<User> getCommonFriends(int userId, int otherUserId) {
-        var friends = new HashSet<>(getUserOrThrow(userId).getFriends());
-        friends.retainAll(getUserOrThrow(otherUserId).getFriends());
+        var friends = new HashSet<>(userStorage.getFriends(userId));
+        friends.retainAll(userStorage.getFriends(otherUserId));
 
         return getUsers(friends);
     }
@@ -51,14 +58,6 @@ public class UserService {
         return result;
     }
 
-    private User getUserOrThrow(int userId) {
-        User user = userStorage.find(userId);
-        if (user == null) {
-            throw new UserNotFoundException(userId);
-        }
-        return user;
-    }
-
     public List<User> getAll() {
         return userStorage.getAll();
     }
@@ -67,11 +66,11 @@ public class UserService {
         return userStorage.find(id);
     }
 
-    public User add(User user) {
-        return userStorage.add(user);
+    public int add(User user) {
+        return userStorage.add(replaceEmptyName(user));
     }
 
-    public User update(User user) {
-        return userStorage.update(user);
+    public void update(User user) {
+        userStorage.update(replaceEmptyName(user));
     }
 }
